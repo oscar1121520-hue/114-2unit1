@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語雙模強化挑戰賽 v3.5</title>
+    <title>英語雙模強化挑戰賽 v4.0</title>
     <style>
         :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -47,7 +47,7 @@
     <div id="start-screen">
         <h1 style="color: var(--primary); margin-bottom: 5px;">🎓 英語雙模強化挑戰賽</h1>
         <div class="rank-info">
-            💡 <b>合併計分規則</b>：對一題+10，錯一題-5。總榜 = A最高分 + B最高分。輸入相同姓名即可合併。
+            💡 <b>規則</b>：答錯扣 5 分。總榜 = (A模式最高) + (B模式最高)。輸入相同姓名即可合併。
         </div>
         
         <div id="loading-msg">⏳ 正在連線雲端資料庫...</div>
@@ -60,7 +60,7 @@
                 <option value="劉開晨">劉開晨</option><option value="其他">其他</option>
             </select>
             
-            <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請在此輸入您的姓名">
+            <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請輸入姓名以合併成績">
 
             <div class="mode-container">
                 <div class="btn-mode" onclick="startGame('模式A')"><h2>模式 A</h2><p>看中拼英</p></div>
@@ -95,14 +95,14 @@
                 <tbody></tbody>
             </table>
         </div>
-        <button id="restart-btn" onclick="location.reload()" style="margin-top:30px; padding:12px 40px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none; font-size:1.1rem; font-weight:bold;">返回首頁</button>
+        <button onclick="location.reload()" style="margin-top:30px; padding:12px 40px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none; font-size:1.1rem; font-weight:bold;">返回首頁</button>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
     let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 360, timer, currentIdx = 0, wrongAnswers = [];
-    let isSubmitting = false; // 防止重複送出的旗標
+    window.isGameEnding = false; // 全域鎖定
 
     window.onload = async () => {
         try {
@@ -141,11 +141,11 @@
         const customInput = document.getElementById('custom-name');
         let nameToUse = select.value === '其他' ? customInput.value.trim() : select.value;
 
-        if (!nameToUse) return alert("請輸入或選擇姓名！");
+        if (!nameToUse) return alert("請輸入姓名！");
 
         currentPlayer = nameToUse;
         currentMode = mode; score = 0; timeLeft = 360; currentIdx = 0; wrongAnswers = [];
-        isSubmitting = false; // 重置送出狀態
+        window.isGameEnding = false;
         wordBank.sort(() => Math.random() - 0.5);
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
@@ -158,17 +158,17 @@
     }
 
     function nextQuiz() {
-        if(currentIdx >= wordBank.length || timeLeft <= 0) return endGame();
+        if(currentIdx >= wordBank.length || window.isGameEnding) return endGame();
         const quizBox = document.getElementById('quiz-box'), ansInput = document.getElementById('ans-input'), optionsArea = document.getElementById('options-area');
         const q = wordBank[currentIdx];
-        document.getElementById('score-info').innerText = `挑戰者：${currentPlayer} | 目前積分：${score}`;
+        document.getElementById('score-info').innerText = `目前積分：${score}`;
         ansInput.className = "";
         if (currentMode === '模式A') {
             quizBox.innerHTML = `<div style="font-size:2.2rem; font-weight:bold;">${q.zh}</div>`;
             ansInput.classList.remove('hidden'); optionsArea.classList.add('hidden');
             ansInput.value = ""; ansInput.focus(); speak(q.en);
         } else {
-            quizBox.innerHTML = `<button class="speaker-btn-big" onclick="speak('${q.en.replace(/'/g, "\\'")}')">🔊</button><p>點擊聽音並選擇正確中文</p>`;
+            quizBox.innerHTML = `<button class="speaker-btn-big" onclick="speak('${q.en.replace(/'/g, "\\'")}')">🔊</button>`;
             ansInput.classList.add('hidden'); optionsArea.classList.remove('hidden');
             generateOptions(q.zh); speak(q.en);
         }
@@ -192,7 +192,7 @@
     }
 
     async function checkAnswer(userVal) {
-        if (isSubmitting) return; // 如果已經結束，不執行判斷
+        if (window.isGameEnding) return;
         const q = wordBank[currentIdx];
         const correct = (currentMode === '模式A' ? q.en : q.zh).toLowerCase();
         const user = userVal.trim().toLowerCase();
@@ -215,39 +215,31 @@
     }
 
     async function endGame() {
-        if (isSubmitting) return; // 關鍵修正：防止重複觸發
-        isSubmitting = true;
-        
+        if (window.isGameEnding) return; 
+        window.isGameEnding = true; 
         clearInterval(timer);
+        
         const bonus = timeLeft > 0 ? timeLeft : 0;
         const total = score + bonus;
         
         document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('result-stats').innerHTML = `答題得分：${score} 分<br>時間紅利：${bonus} 分<br><b style="font-size:1.5rem; color:var(--primary);">總積分：${total} 分</b>`;
+        document.getElementById('result-stats').innerHTML = `答題得分：${score} | 紅利：${bonus} <br><b>最終總積分：${total}</b>`;
         
         const tbody = document.querySelector('#wrong-table tbody');
-        tbody.innerHTML = wrongAnswers.length === 0 ? "<tr><td colspan='3' style='text-align:center;'>完美！</td></tr>" : "";
+        tbody.innerHTML = wrongAnswers.length === 0 ? "<tr><td colspan='3'>完美！</td></tr>" : "";
         wrongAnswers.forEach(w => {
             tbody.innerHTML += `<tr><td><b>${w.title}</b></td><td style="color:var(--danger)">${w.user}</td><td style="color:var(--success); font-weight:bold;">${w.correct}</td></tr>`;
         });
 
-        // 傳送成績並在發送完成前防止其他動作
+        // 穩定傳送機制
+        const payload = JSON.stringify({ name: currentPlayer, score: total, mode: currentMode });
         try {
-            await fetch(API_URL, { 
-                method: "POST", 
-                mode: "no-cors", 
-                body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode }) 
-            });
-            console.log("成績已成功上傳");
-        } catch (e) {
-            console.error("上傳失敗", e);
-        }
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: payload });
+        } catch (e) { console.error("Upload failed", e); }
     }
 
-    document.getElementById('ans-input').addEventListener('keypress', e => { 
-        if(e.key === 'Enter') checkAnswer(e.target.value); 
-    });
+    document.getElementById('ans-input').addEventListener('keypress', e => { if(e.key === 'Enter') checkAnswer(e.target.value); });
 </script>
 </body>
 </html>
