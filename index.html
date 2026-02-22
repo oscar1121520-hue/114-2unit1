@@ -9,65 +9,40 @@
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
         #app { background: white; width: 100%; max-width: 800px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; margin-top: 20px; }
         .hidden { display: none; }
-        
-        /* 下拉選單與按鈕 */
         select { width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 10px; border: 2px solid var(--primary); margin: 15px 0; outline: none; }
         .mode-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
         .btn-mode { padding: 25px; border: 2px solid #ddd; border-radius: 15px; cursor: pointer; transition: 0.3s; background: white; }
         .btn-mode:hover { border-color: var(--primary); background: #f3f0ff; transform: translateY(-3px); }
-        .btn-mode h2 { margin: 0 0 10px 0; color: var(--primary); }
-        
-        /* 排行榜 */
         .rank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
         .rank-card { background: var(--light); padding: 10px; border-radius: 12px; border: 1px solid #dee2e6; min-height: 150px; }
         .rank-card h4 { margin: 8px 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 5px; font-size: 0.9rem; }
         table { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
         td { padding: 6px 2px; border-bottom: 1px solid #eee; }
-
-        /* 遊戲介面 */
         .timer { font-size: 2.8rem; color: var(--danger); font-weight: bold; margin-bottom: 10px; }
-        #quiz-box { background: #f1f3f5; padding: 40px 20px; border-radius: 15px; font-size: 1.6rem; margin-bottom: 20px; min-height: 100px; display: flex; align-items: center; justify-content: center; line-height: 1.4; word-break: break-word; }
-        input[type="text"] { width: 85%; padding: 15px; font-size: 1.4rem; border: 2px solid #ddd; border-radius: 10px; text-align: center; outline: none; transition: 0.2s; }
-        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(108, 92, 231, 0.2); }
+        #quiz-box { background: #f1f3f5; padding: 40px 20px; border-radius: 15px; font-size: 1.6rem; margin-bottom: 20px; min-height: 100px; display: flex; align-items: center; justify-content: center; line-height: 1.6; word-break: break-word; }
+        input[type="text"] { width: 85%; padding: 15px; font-size: 1.4rem; border: 2px solid #ddd; border-radius: 10px; text-align: center; outline: none; }
         .hint-text { color: var(--primary); margin: 10px 0; font-weight: bold; min-height: 1.2rem; }
-        .btn-hint { background: var(--accent, #fdcb6e); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        .btn-hint { background: #fdcb6e; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        .speaker-btn { font-size: 1.5rem; cursor: pointer; background: none; border: none; vertical-align: middle; margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <div id="app">
     <div id="start-screen">
-        <h1 style="color: var(--primary); margin-bottom: 10px;">🎓 英語雲端雙模挑戰賽</h1>
-        <div id="loading-msg">⏳ 正在連線至雲端資料庫與計算排行榜...</div>
-
+        <h1 style="color: var(--primary);">🎓 英語雲端挑戰賽</h1>
+        <div id="loading-msg">⏳ 正在連線資料庫...</div>
         <div id="main-ui" class="hidden">
-            <div style="text-align: left; background: #fff4e6; padding: 20px; border-radius: 15px; border-left: 5px solid #e67e22;">
-                <label><b>👤 第一步：請選擇你的姓名</b></label>
-                <select id="user-select">
-                    <option value="">-- 請選擇名字 --</option>
-                    <option value="Oscar">Oscar</option>
-                    <option value="Alex">Alex</option>
-                    <option value="Eve">Eve</option>
-                    <option value="Xavier">Xavier</option>
-                    <option value="Tim">Tim</option>
-                    <option value="Chloe">Chloe</option>
-                    <option value="劉開晨">劉開晨</option>
-                    <option value="其他">其他</option>
-                </select>
-            </div>
-
-            <p style="margin-top: 20px; font-weight: bold;">第二步：選擇挑戰模式 (限時 6 分鐘)</p>
+            <select id="user-select">
+                <option value="">-- 請選擇名字 --</option>
+                <option value="Oscar">Oscar</option><option value="Alex">Alex</option><option value="Eve">Eve</option>
+                <option value="Xavier">Xavier</option><option value="Tim">Tim</option><option value="Chloe">Chloe</option>
+                <option value="劉開晨">劉開晨</option><option value="其他">其他</option>
+            </select>
             <div class="mode-container">
-                <div class="btn-mode" onclick="startGame('模式A')">
-                    <h2>模式 A</h2><p>看中拼英<br>輸入完整單字</p>
-                </div>
-                <div class="btn-mode" onclick="startGame('模式B')">
-                    <h2>模式 B</h2><p>例句填空<br>保留頭尾字母</p>
-                </div>
+                <div class="btn-mode" onclick="startGame('模式A')"><h2>模式 A</h2><p>看中拼英 (含讀音)</p></div>
+                <div class="btn-mode" onclick="startGame('模式B')"><h2>模式 B</h2><p>例句填空 (保留首尾)</p></div>
             </div>
-
-            <hr style="border: 0; border-top: 1px solid #ddd; margin: 30px 0;">
-            <h3>📊 即時排行榜 (A+B 累計)</h3>
             <div class="rank-grid">
                 <div class="rank-card"><h4>模式 A 榜</h4><div id="rankA"></div></div>
                 <div class="rank-card"><h4>模式 B 榜</h4><div id="rankB"></div></div>
@@ -78,12 +53,13 @@
 
     <div id="game-screen" class="hidden">
         <div class="timer" id="timer-display">360</div>
-        <div id="score-info" style="font-weight: bold; margin-bottom: 15px; color: var(--dark);"></div>
+        <div id="score-info" style="font-weight: bold; margin-bottom: 10px;"></div>
         <div id="quiz-box"></div>
         <div id="hint-area" class="hint-text"></div>
-        <input type="text" id="ans-input" placeholder="在此輸入答案並按 Enter" autocomplete="off" spellcheck="false">
+        <input type="text" id="ans-input" placeholder="輸入答案並按 Enter" autocomplete="off" spellcheck="false">
         <br>
-        <button id="hint-btn" class="btn-hint" onclick="useHint()">💡 顯示中文提示 (本題積分減半)</button>
+        <button id="hint-btn" class="btn-hint" onclick="useHint()">💡 中文提示 (積分減半)</button>
+        <button class="speaker-btn" onclick="speakWord()">🔊</button>
     </div>
 </div>
 
@@ -99,38 +75,28 @@
             renderTable('rankA', data.rankA);
             renderTable('rankB', data.rankB);
             renderTable('rankTotal', data.rankTotal);
-
             const wordRes = await fetch(`${API_URL}?action=getWords`);
             wordBank = await wordRes.json();
-
             document.getElementById('loading-msg').classList.add('hidden');
             document.getElementById('main-ui').classList.remove('hidden');
-        } catch (e) {
-            document.getElementById('loading-msg').innerText = "❌ 無法讀取資料，請確認 Apps Script 已正確部署並開啟權限。";
-            console.error(e);
-        }
+        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 資料載入失敗"; }
     };
 
     function renderTable(id, data) {
         const container = document.getElementById(id);
-        if(!data || data.length === 0) { container.innerHTML = "<p style='color:#999'>暫無排名</p>"; return; }
+        if(!data || data.length === 0) { container.innerHTML = "暫無排名"; return; }
         let html = "<table>";
-        data.forEach((r, i) => {
-            html += `<tr><td>${i+1}. ${r.name}</td><td align="right"><b>${r.score}</b></td></tr>`;
-        });
+        data.forEach((r, i) => { html += `<tr><td>${i+1}. ${r.name}</td><td align="right">${r.score}</td></tr>`; });
         container.innerHTML = html + "</table>";
     }
 
     function startGame(mode) {
         currentPlayer = document.getElementById('user-select').value;
-        if (!currentPlayer) { alert("請先選擇你的姓名！"); return; }
-        
+        if (!currentPlayer) { alert("請先選擇姓名！"); return; }
         currentMode = mode; score = 0; timeLeft = 360; currentIdx = 0;
-        wordBank.sort(() => Math.random() - 0.5); // 隨機出題
-
+        wordBank.sort(() => Math.random() - 0.5);
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
-        
         nextQuiz();
         timer = setInterval(() => {
             timeLeft--;
@@ -154,59 +120,62 @@
             document.getElementById('quiz-box').innerHTML = maskWord(q.sentence, q.en);
             document.getElementById('hint-btn').classList.remove('hidden');
         }
-        document.getElementById('score-info').innerText = `挑戰者：${currentPlayer} | 目前累積得分：${score}`;
+        document.getElementById('score-info').innerText = `挑戰者：${currentPlayer} | 目前積分：${score}`;
+        
+        // 模式 A 自動發音，模式 B 由使用者決定或自行加入
+        speakWord();
+    }
+
+    function speakWord() {
+        if (!wordBank[currentIdx]) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(wordBank[currentIdx].en);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
     }
 
     function maskWord(sentence, target) {
-        // 將正確答案拆解，保留各單字頭尾
-        const words = target.split(' ');
-        const masked = words.map(w => {
-            if(w.length <= 1) return "_";
-            if(w.length === 2) return w[0] + "_";
-            return w[0] + "_".repeat(w.length-2) + w[w.length-1];
-        }).join(' ');
+        // 使用更精確的邊界判斷與正則表達式
+        const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escapeRegExp(target)}\\b`, 'gi');
         
-        // 不分大小寫尋找並取代
-        const regex = new RegExp(target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        return sentence.replace(regex, `<span style="color:var(--primary); font-weight:bold; border-bottom:2px solid var(--primary)">${masked}</span>`);
+        return sentence.replace(regex, (match) => {
+            const parts = match.split(' ');
+            const maskedParts = parts.map(w => {
+                if (w.length <= 1) return "_";
+                const first = w[0];
+                const last = w[w.length - 1];
+                const middle = "_".repeat(w.length - 2);
+                return first + middle + last;
+            });
+            // 加上 <span> 標籤並確保前後有空格（透過 CSS 或空白字元）
+            return ` <span style="color:var(--primary); font-weight:bold; border-bottom:2px solid">${maskedParts.join(' ')}</span> `;
+        });
     }
 
     function useHint() {
         isHintUsed = true;
-        document.getElementById('hint-area').innerText = "💡 中文提示：" + wordBank[currentIdx].zh_hint;
+        document.getElementById('hint-area').innerText = "💡 提示：" + wordBank[currentIdx].zh_hint;
     }
 
     function checkAnswer() {
         const input = document.getElementById('ans-input').value.trim().toLowerCase();
         const ans = wordBank[currentIdx].en.toLowerCase();
-        
-        if (input === ans) {
-            let gain = isHintUsed ? 5 : 10;
-            score += gain;
-        } else {
-            score = Math.max(0, score - 5);
-        }
+        if (input === ans) { score += isHintUsed ? 5 : 10; } 
+        else { score = Math.max(0, score - 5); }
         currentIdx++;
         nextQuiz();
     }
 
     async function endGame() {
         clearInterval(timer);
-        const timeBonus = timeLeft > 0 ? timeLeft : 0;
-        const finalScore = score + timeBonus;
-        
-        document.getElementById('game-screen').innerHTML = "<h2>🎉 挑戰結束！正在同步成績...</h2>";
-        
+        const bonus = timeLeft > 0 ? timeLeft : 0;
+        const final = score + bonus;
+        document.getElementById('game-screen').innerHTML = "<h2>🎉 儲存成績中...</h2>";
         try {
-            await fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ name: currentPlayer, score: finalScore, mode: currentMode })
-            });
-            alert(`挑戰完成！\n答題積分：${score}\n時間紅利：${timeBonus}\n最終總分：${finalScore}`);
-        } catch (e) {
-            alert("成績存檔時發生錯誤，但別擔心，可以截圖給老師！");
-        }
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: currentPlayer, score: final, mode: currentMode }) });
+        } catch (e) {}
+        alert(`挑戰結束！\n答題積分：${score}\n時間獎勵：${bonus}\n最終總分：${final}`);
         location.reload();
     }
 
