@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語雙模挑戰賽 v3</title>
+    <title>英語雙模挑戰賽 v3.1</title>
     <style>
         :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -18,21 +18,29 @@
         .timer { font-size: 2.8rem; color: var(--danger); font-weight: bold; margin-bottom: 10px; }
         #quiz-box { background: #f1f3f5; padding: 40px 20px; border-radius: 15px; font-size: 1.8rem; margin-bottom: 20px; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* 模式 B 選項樣式 */
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
         .opt-btn { padding: 15px; background: white; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
         .opt-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-        input[type="text"] { width: 85%; padding: 15px; font-size: 1.4rem; border: 3px solid #ddd; border-radius: 10px; text-align: center; outline: none; }
+        input[type="text"] { width: 85%; padding: 15px; font-size: 1.4rem; border: 3px solid #ddd; border-radius: 10px; text-align: center; outline: none; transition: 0.2s; }
+        /* 紅框震動動畫 */
+        .input-error { border-color: var(--danger) !important; animation: shake 0.4s; }
+        .input-success { border-color: var(--success) !important; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+        }
         
-        /* 錯題本表格 */
         .wrong-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
-        .wrong-table th, .wrong-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .wrong-table th { background: #f8d7da; color: #721c24; }
+        .wrong-table th, .wrong-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .wrong-table th { background: #f2f2f2; }
         
-        .rank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; font-size: 0.8rem; }
-        .rank-card { background: var(--light); padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        .speaker-btn-big { font-size: 3rem; cursor: pointer; background: #6c5ce7; color: white; border: none; border-radius: 50%; width: 80px; height: 80px; margin-bottom: 15px; }
+        .rank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .rank-card { background: var(--light); padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.85rem; }
+        .speaker-btn-big { font-size: 3rem; cursor: pointer; background: var(--primary); color: white; border: none; border-radius: 50%; width: 80px; height: 80px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -52,10 +60,10 @@
                 <div class="btn-mode" onclick="startGame('模式A')"><h2>模式 A</h2><p>看中拼英</p></div>
                 <div class="btn-mode" onclick="startGame('模式B')"><h2>模式 B</h2><p>聽英選中</p></div>
             </div>
-            <div class="rank-grid" id="rank-display">
-                <div class="rank-card"><h4>模式 A</h4><div id="rankA"></div></div>
-                <div class="rank-card"><h4>模式 B</h4><div id="rankB"></div></div>
-                <div class="rank-card"><h4>總榜</h4><div id="rankTotal"></div></div>
+            <div class="rank-grid">
+                <div class="rank-card"><b>🏆 模式 A</b><div id="rankA"></div></div>
+                <div class="rank-card"><b>🏆 模式 B</b><div id="rankB"></div></div>
+                <div class="rank-card"><b>🔥 總榜</b><div id="rankTotal"></div></div>
             </div>
         </div>
     </div>
@@ -63,30 +71,31 @@
     <div id="game-screen" class="hidden">
         <div class="timer" id="timer-display">360</div>
         <div id="score-info" style="font-weight: bold; margin-bottom: 10px;"></div>
-        <div id="quiz-box">
-            </div>
+        <div id="quiz-box"></div>
         <div id="input-area">
-            <input type="text" id="ans-input" class="hidden" placeholder="輸入答案並按 Enter">
+            <input type="text" id="ans-input" class="hidden" placeholder="輸入正確英文並按 Enter">
             <div id="options-area" class="options-grid hidden"></div>
         </div>
     </div>
 
     <div id="result-screen" class="hidden">
-        <h2 id="final-msg">挑戰完成！</h2>
-        <div id="result-stats" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
+        <h2>🎉 挑戰完成！</h2>
+        <div id="result-stats" style="font-size: 1.2rem; margin: 20px 0;"></div>
         <div id="wrong-book-area">
-            <h3>單字錯題本</h3>
+            <h3 style="color: var(--danger);">✍️ 單字錯題本</h3>
             <table class="wrong-table" id="wrong-table">
-                <thead><tr><th>題目</th><th>你的答案</th><th>正確答案</th></tr></thead>
+                <thead><tr><th>題目 (音)</th><th>你的答案</th><th>正確答案</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
-        <button onclick="location.reload()" style="margin-top:20px; padding:10px 30px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none;">回首頁</button>
+        <button onclick="location.reload()" style="margin-top:30px; padding:12px 40px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none; font-size:1rem;">回首頁</button>
     </div>
 </div>
 
 <script>
+    // 已更新為您提供的最新 API 網址
     const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
+    
     let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 360, timer;
     let currentIdx = 0, wrongAnswers = [];
 
@@ -101,20 +110,24 @@
             wordBank = await wordRes.json();
             document.getElementById('loading-msg').classList.add('hidden');
             document.getElementById('main-ui').classList.remove('hidden');
-        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 載入失敗"; }
+        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 載入失敗，請確認 API 網址與權限設定"; }
     };
 
     function renderTable(id, data) {
         const container = document.getElementById(id);
-        if(!data || data.length === 0) { container.innerHTML = "無"; return; }
+        if(!data || data.length === 0) { container.innerHTML = "無資料"; return; }
         let html = "";
-        data.forEach((r, i) => { html += `<div>${i+1}.${r.name}(${r.score})</div>`; });
+        data.forEach((r, i) => { 
+            html += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; margin:2px 0;">
+                        <span>${i+1}.${r.name}</span><span>${r.score}</span>
+                     </div>`; 
+        });
         container.innerHTML = html;
     }
 
     function startGame(mode) {
         currentPlayer = document.getElementById('user-select').value;
-        if (!currentPlayer) return alert("請選擇姓名");
+        if (!currentPlayer) return alert("請先選擇名字");
         currentMode = mode; score = 0; timeLeft = 360; currentIdx = 0; wrongAnswers = [];
         wordBank.sort(() => Math.random() - 0.5);
         document.getElementById('start-screen').classList.add('hidden');
@@ -135,16 +148,17 @@
         const q = wordBank[currentIdx];
         
         document.getElementById('score-info').innerText = `挑戰者：${currentPlayer} | 目前積分：${score}`;
-        
+        ansInput.className = ""; // 重置動畫樣式
+
         if (currentMode === '模式A') {
-            quizBox.innerHTML = `<div>${q.zh}</div>`;
+            quizBox.innerHTML = `<div style="font-size:2rem;">${q.zh}</div>`;
             ansInput.classList.remove('hidden');
             optionsArea.classList.add('hidden');
             ansInput.value = "";
             ansInput.focus();
-            speak(q.en); // 模式A依舊播放發音
+            speak(q.en);
         } else {
-            quizBox.innerHTML = `<button class="speaker-btn-big" onclick="speak('${q.en.replace(/'/g, "\\'")}')">🔊</button><p>點擊播放並選擇中文</p>`;
+            quizBox.innerHTML = `<button class="speaker-btn-big" onclick="speak('${q.en.replace(/'/g, "\\'")}')">🔊</button><p>點擊按鈕播放，並選擇正確中文</p>`;
             ansInput.classList.add('hidden');
             optionsArea.classList.remove('hidden');
             generateOptions(q.zh);
@@ -155,11 +169,11 @@
     function generateOptions(correctZh) {
         const area = document.getElementById('options-area');
         area.innerHTML = "";
-        // 從題庫抓 9 個錯的 + 1 個對的
+        // 從題庫中隨機挑選 9 個錯誤答案
         let others = wordBank.filter(w => w.zh !== correctZh).map(w => w.zh);
         let choices = others.sort(() => Math.random() - 0.5).slice(0, 9);
         choices.push(correctZh);
-        choices.sort(() => Math.random() - 0.5);
+        choices.sort(() => Math.random() - 0.5); // 隨機排序 10 個選項
 
         choices.forEach(c => {
             const btn = document.createElement('button');
@@ -177,16 +191,26 @@
         window.speechSynthesis.speak(msg);
     }
 
-    function checkAnswer(userVal) {
+    async function checkAnswer(userVal) {
         const q = wordBank[currentIdx];
         const correct = (currentMode === '模式A' ? q.en : q.zh).toLowerCase();
         const user = userVal.trim().toLowerCase();
+        const inputField = document.getElementById('ans-input');
 
         if (user === correct) {
             score += 10;
+            inputField.classList.add('input-success');
+            await new Promise(r => setTimeout(r, 200)); // 答對稍作停頓
         } else {
             score = Math.max(0, score - 5);
-            wrongAnswers.push({ title: q.en, user: user || "(無)", correct: correct });
+            // 紀錄錯題 (紀錄英文單字、使用者的答案、正確答案)
+            wrongAnswers.push({ title: q.en, user: user || "(未選/未填)", correct: correct });
+            
+            // 模式 A 的紅框震動效果
+            if (currentMode === '模式A') {
+                inputField.classList.add('input-error');
+                await new Promise(r => setTimeout(r, 400));
+            }
         }
         currentIdx++;
         nextQuiz();
@@ -199,19 +223,20 @@
         
         document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('result-stats').innerHTML = `答題得分：${score} <br> 時間獎勵：${bonus} <br> <b>最終總分：${total}</b>`;
+        document.getElementById('result-stats').innerHTML = `答題得分：${score} 分<br>時間紅利：${bonus} 分<br><b>最終總積分：${total} 分</b>`;
         
-        // 渲染錯題本
+        // 渲染錯題本內容
         const tbody = document.querySelector('#wrong-table tbody');
-        tbody.innerHTML = wrongAnswers.length === 0 ? "<tr><td colspan='3'>太強了！全對！</td></tr>" : "";
+        tbody.innerHTML = wrongAnswers.length === 0 ? "<tr><td colspan='3'>恭喜！沒有任何錯題。</td></tr>" : "";
         wrongAnswers.forEach(w => {
-            tbody.innerHTML += `<tr><td>${w.title}</td><td style="color:red">${w.user}</td><td style="color:green">${w.correct}</td></tr>`;
+            tbody.innerHTML += `<tr><td>${w.title}</td><td style="color:var(--danger)">${w.user}</td><td style="color:var(--success)">${w.correct}</td></tr>`;
         });
 
-        // 異步傳送成績
+        // 傳送成績至 Google 試算表 (背景執行)
         fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode }) });
     }
 
+    // 模式 A 監聽 Enter 鍵
     document.getElementById('ans-input').addEventListener('keypress', e => {
         if(e.key === 'Enter') checkAnswer(e.target.value);
     });
