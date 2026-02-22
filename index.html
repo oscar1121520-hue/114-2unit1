@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語雙模強化挑戰賽 v3.3</title>
+    <title>英語雙模強化挑戰賽 v3.5</title>
     <style>
-        :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; --accent: #fdcb6e; }
+        :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
         #app { background: white; width: 100%; max-width: 800px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; margin-top: 20px; }
         .hidden { display: none; }
@@ -15,7 +15,7 @@
         .btn-mode { padding: 25px; border: 2px solid #ddd; border-radius: 15px; cursor: pointer; transition: 0.3s; background: white; }
         .btn-mode:hover { border-color: var(--primary); background: #f3f0ff; transform: translateY(-3px); }
 
-        .rank-info { font-size: 0.8rem; color: #666; margin-bottom: 10px; background: #fff9db; padding: 5px; border-radius: 5px; }
+        .rank-info { font-size: 0.8rem; color: #666; margin-bottom: 10px; background: #fff9db; padding: 8px; border-radius: 8px; line-height: 1.4; }
         .rank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
         .rank-card { background: var(--light); padding: 12px 10px; border-radius: 12px; border: 1px solid #dee2e6; min-height: 200px; }
         .rank-card b { display: block; margin-bottom: 8px; color: var(--dark); border-bottom: 2px solid #ddd; padding-bottom: 5px; font-size: 0.9rem; }
@@ -46,7 +46,9 @@
 <div id="app">
     <div id="start-screen">
         <h1 style="color: var(--primary); margin-bottom: 5px;">🎓 英語雙模強化挑戰賽</h1>
-        <div class="rank-info">💡 規則：對+10，錯-5(含負分)。總榜 = A最高分 + B最高分。</div>
+        <div class="rank-info">
+            💡 <b>合併計分規則</b>：對一題+10，錯一題-5。總榜 = A最高分 + B最高分。輸入相同姓名即可合併。
+        </div>
         
         <div id="loading-msg">⏳ 正在連線雲端資料庫...</div>
         
@@ -58,7 +60,7 @@
                 <option value="劉開晨">劉開晨</option><option value="其他">其他</option>
             </select>
             
-            <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請輸入您的姓名">
+            <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請在此輸入您的姓名">
 
             <div class="mode-container">
                 <div class="btn-mode" onclick="startGame('模式A')"><h2>模式 A</h2><p>看中拼英</p></div>
@@ -93,13 +95,14 @@
                 <tbody></tbody>
             </table>
         </div>
-        <button onclick="location.reload()" style="margin-top:30px; padding:12px 40px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none; font-size:1.1rem; font-weight:bold;">返回首頁</button>
+        <button id="restart-btn" onclick="location.reload()" style="margin-top:30px; padding:12px 40px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none; font-size:1.1rem; font-weight:bold;">返回首頁</button>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
     let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 360, timer, currentIdx = 0, wrongAnswers = [];
+    let isSubmitting = false; // 防止重複送出的旗標
 
     window.onload = async () => {
         try {
@@ -118,8 +121,8 @@
     function toggleCustomName() {
         const select = document.getElementById('user-select');
         const customInput = document.getElementById('custom-name');
-        if (select.value === '其他') customInput.classList.remove('hidden');
-        else customInput.classList.add('hidden');
+        if (select.value === '其他') { customInput.classList.remove('hidden'); customInput.focus(); }
+        else { customInput.classList.add('hidden'); }
     }
 
     function renderTable(id, data) {
@@ -136,16 +139,13 @@
     function startGame(mode) {
         const select = document.getElementById('user-select');
         const customInput = document.getElementById('custom-name');
-        
-        if (select.value === '其他') {
-            currentPlayer = customInput.value.trim();
-            if (!currentPlayer) return alert("請輸入您的姓名！");
-        } else {
-            currentPlayer = select.value;
-            if (!currentPlayer) return alert("請先選擇姓名！");
-        }
+        let nameToUse = select.value === '其他' ? customInput.value.trim() : select.value;
 
+        if (!nameToUse) return alert("請輸入或選擇姓名！");
+
+        currentPlayer = nameToUse;
         currentMode = mode; score = 0; timeLeft = 360; currentIdx = 0; wrongAnswers = [];
+        isSubmitting = false; // 重置送出狀態
         wordBank.sort(() => Math.random() - 0.5);
         document.getElementById('start-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
@@ -158,7 +158,7 @@
     }
 
     function nextQuiz() {
-        if(currentIdx >= wordBank.length) return endGame();
+        if(currentIdx >= wordBank.length || timeLeft <= 0) return endGame();
         const quizBox = document.getElementById('quiz-box'), ansInput = document.getElementById('ans-input'), optionsArea = document.getElementById('options-area');
         const q = wordBank[currentIdx];
         document.getElementById('score-info').innerText = `挑戰者：${currentPlayer} | 目前積分：${score}`;
@@ -192,6 +192,7 @@
     }
 
     async function checkAnswer(userVal) {
+        if (isSubmitting) return; // 如果已經結束，不執行判斷
         const q = wordBank[currentIdx];
         const correct = (currentMode === '模式A' ? q.en : q.zh).toLowerCase();
         const user = userVal.trim().toLowerCase();
@@ -202,7 +203,7 @@
             if(currentMode === '模式A') inputField.classList.add('input-success');
             await new Promise(r => setTimeout(r, 150));
         } else {
-            score -= 5; // 這裡改為直接減分，不限於 0
+            score -= 5;
             wrongAnswers.push({ title: q.en, user: user || "(未答)", correct: correct });
             if(currentMode === '模式A') {
                 inputField.classList.add('input-error');
@@ -214,21 +215,39 @@
     }
 
     async function endGame() {
+        if (isSubmitting) return; // 關鍵修正：防止重複觸發
+        isSubmitting = true;
+        
         clearInterval(timer);
         const bonus = timeLeft > 0 ? timeLeft : 0;
         const total = score + bonus;
+        
         document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
         document.getElementById('result-stats').innerHTML = `答題得分：${score} 分<br>時間紅利：${bonus} 分<br><b style="font-size:1.5rem; color:var(--primary);">總積分：${total} 分</b>`;
+        
         const tbody = document.querySelector('#wrong-table tbody');
-        tbody.innerHTML = wrongAnswers.length === 0 ? "<tr><td colspan='3' style='text-align:center;'>完美！沒有錯題。</td></tr>" : "";
+        tbody.innerHTML = wrongAnswers.length === 0 ? "<tr><td colspan='3' style='text-align:center;'>完美！</td></tr>" : "";
         wrongAnswers.forEach(w => {
             tbody.innerHTML += `<tr><td><b>${w.title}</b></td><td style="color:var(--danger)">${w.user}</td><td style="color:var(--success); font-weight:bold;">${w.correct}</td></tr>`;
         });
-        fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode }) });
+
+        // 傳送成績並在發送完成前防止其他動作
+        try {
+            await fetch(API_URL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode }) 
+            });
+            console.log("成績已成功上傳");
+        } catch (e) {
+            console.error("上傳失敗", e);
+        }
     }
 
-    document.getElementById('ans-input').addEventListener('keypress', e => { if(e.key === 'Enter') checkAnswer(e.target.value); });
+    document.getElementById('ans-input').addEventListener('keypress', e => { 
+        if(e.key === 'Enter') checkAnswer(e.target.value); 
+    });
 </script>
 </body>
 </html>
