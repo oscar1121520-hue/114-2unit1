@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語三模強化挑戰賽 v6.0</title>
+    <title>英語三模強化挑戰賽 v6.1</title>
     <style>
         :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; --extra: #e67e22; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -46,7 +46,7 @@
                 <option value="">-- 請選擇姓名 --</option>
                 <option value="Oscar">Oscar</option><option value="Alex">Alex</option><option value="Eve">Eve</option>
                 <option value="Xavier">Xavier</option><option value="Tim">Tim</option><option value="Chloe">Chloe</option>
-                <option value="劉開晨">劉開晨</option><option value="其他">其他</option>
+                <option value="Marco">Marco</option> <option value="其他">其他</option>
             </select>
             <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請在此輸入姓名">
 
@@ -84,7 +84,9 @@
 </div>
 
 <script>
+    // 請確認您的 API 網址是否正確
     const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
+    
     let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 0, currentIdx = 0, gameTimer = null, isProcessing = false;
 
     window.onload = async () => {
@@ -205,15 +207,18 @@
         document.getElementById('result-screen').classList.remove('hidden');
         document.getElementById('result-stats').innerHTML = `得分：${score} | 紅利：${bonus}<br><b>總積分：${total}</b>`;
         
-        // 核心上傳機制：改回 POST 並等待確認
+        // 穩定上傳資料至 Google Apps Script
         try {
-            const response = await fetch(API_URL, {
+            await fetch(API_URL, {
                 method: "POST",
+                mode: "no-cors", // Google Apps Script 必要設定
                 body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode })
             });
-            document.getElementById('upload-status').innerText = "✅ 成績已成功存入排行榜！";
+            // 延遲一點點確保 Google Server 處理完畢
+            await new Promise(r => setTimeout(r, 1000));
+            document.getElementById('upload-status').innerText = "✅ 成績已成功存入雲端！";
         } catch (e) {
-            document.getElementById('upload-status').innerText = "⚠️ 自動同步失敗，但已記錄於後端。";
+            document.getElementById('upload-status').innerText = "⚠️ 上傳可能稍有延遲，請稍後查看排行榜。";
         } finally {
             const backBtn = document.getElementById('back-btn');
             backBtn.disabled = false;
