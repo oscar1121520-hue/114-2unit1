@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語三模強化挑戰賽 v5.3</title>
+    <title>英語三模強化挑戰賽 v6.0</title>
     <style>
         :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; --extra: #e67e22; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -14,8 +14,6 @@
         .mode-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
         .btn-mode { padding: 20px 10px; border: 2px solid #ddd; border-radius: 15px; cursor: pointer; transition: 0.3s; background: white; }
         .btn-mode:hover { border-color: var(--primary); background: #f3f0ff; transform: translateY(-3px); }
-        .btn-mode.c { border-color: var(--extra); }
-        .btn-mode.c:hover { background: #fff5eb; border-color: var(--extra); }
 
         .rank-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
         .rank-card { background: var(--light); padding: 10px; border-radius: 12px; border: 1px solid #dee2e6; min-height: 180px; }
@@ -26,16 +24,14 @@
         #quiz-box { background: #f1f3f5; padding: 30px 20px; border-radius: 15px; font-size: 1.8rem; margin-bottom: 20px; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-        .opt-btn { padding: 18px 12px; background: white; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; font-size: 1.1rem; transition: 0.1s; outline: none; font-weight: 500; }
-        .opt-success { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
-        .opt-danger { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+        .opt-btn { padding: 18px 12px; background: white; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; font-size: 1.1rem; transition: 0.1s; outline: none; }
+        .opt-success { background: var(--success) !important; color: white !important; }
+        .opt-danger { background: var(--danger) !important; color: white !important; }
 
-        input[type="text"] { width: 85%; padding: 15px; font-size: 1.4rem; border: 3px solid #ddd; border-radius: 10px; text-align: center; outline: none; }
         .shake { animation: shake 0.4s; border-color: var(--danger) !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-8px); } }
         
-        .speaker-btn-big { font-size: 3rem; cursor: pointer; background: var(--primary); color: white; border: none; border-radius: 50%; width: 70px; height: 70px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
-        .speaker-btn-c { background: var(--extra); box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3); }
+        #upload-status { font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -43,7 +39,7 @@
 <div id="app">
     <div id="start-screen">
         <h1 style="color: var(--primary);">🎓 英語三模強化挑戰賽</h1>
-        <div id="loading-msg">⏳ 正在連線雲端資料庫...</div>
+        <div id="loading-msg">⏳ 正在載入雲端紀錄...</div>
         
         <div id="main-ui" class="hidden">
             <select id="user-select" onchange="toggleCustomName()">
@@ -57,14 +53,14 @@
             <div class="mode-container">
                 <div class="btn-mode" onclick="startGame('模式A')"><h3>模式 A</h3><p>看中拼英</p></div>
                 <div class="btn-mode" onclick="startGame('模式B')"><h3>模式 B</h3><p>聽英選中</p></div>
-                <div class="btn-mode c" onclick="startGame('模式C')"><h3>模式 C</h3><p>課外單字</p></div>
+                <div class="btn-mode" style="border-color:var(--extra)" onclick="startGame('模式C')"><h3>模式 C</h3><p>課外單字</p></div>
             </div>
 
             <div class="rank-grid">
-                <div class="rank-card"><b>🏆 模式 A</b><div id="rankA"></div></div>
-                <div class="rank-card"><b>🏆 模式 B</b><div id="rankB"></div></div>
-                <div class="rank-card"><b>🏆 模式 C</b><div id="rankC"></div></div>
-                <div class="rank-card" style="background: #efebff;"><b>🔥 總積分</b><div id="rankTotal"></div></div>
+                <div class="rank-card"><b>🏆 模式 A (最佳)</b><div id="rankA"></div></div>
+                <div class="rank-card"><b>🏆 模式 B (最佳)</b><div id="rankB"></div></div>
+                <div class="rank-card"><b>🏆 模式 C (最佳)</b><div id="rankC"></div></div>
+                <div class="rank-card" style="background: #efebff;"><b>🔥 總分榜</b><div id="rankTotal"></div></div>
             </div>
         </div>
     </div>
@@ -74,7 +70,7 @@
         <div id="score-info" style="font-weight: bold; margin-bottom: 10px;"></div>
         <div id="quiz-box"></div>
         <div id="input-area">
-            <input type="text" id="ans-input" class="hidden" placeholder="輸入完請按 Enter">
+            <input type="text" id="ans-input" class="hidden" placeholder="輸入完按 Enter">
             <div id="options-area" class="options-grid hidden"></div>
         </div>
     </div>
@@ -82,28 +78,23 @@
     <div id="result-screen" class="hidden">
         <h2>🎉 挑戰完成！</h2>
         <div id="result-stats" style="font-size: 1.4rem; margin: 20px 0;"></div>
-        <button onclick="location.reload()" style="padding:15px 50px; border-radius:10px; cursor:pointer; background:var(--primary); color:white; border:none; font-size:1.1rem; font-weight:bold;">返回排行榜</button>
+        <div id="upload-status">⏳ 成績同步中，請稍候...</div>
+        <button id="back-btn" onclick="location.reload()" disabled style="padding:15px 50px; border-radius:10px; cursor:not-allowed; background:#ccc; color:white; border:none; font-size:1.1rem; margin-top:10px;">請稍候</button>
     </div>
 </div>
 
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
-    
-    let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 0, currentIdx = 0;
-    let gameTimer = null;
-    let isProcessing = false;
+    let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 0, currentIdx = 0, gameTimer = null, isProcessing = false;
 
     window.onload = async () => {
         try {
             const res = await fetch(API_URL + `?t=${Date.now()}`);
             const data = await res.json();
-            renderTable('rankA', data.rankA); 
-            renderTable('rankB', data.rankB); 
-            renderTable('rankC', data.rankC); 
-            renderTable('rankTotal', data.rankTotal);
+            ['rankA', 'rankB', 'rankC', 'rankTotal'].forEach(id => renderTable(id, data[id]));
             document.getElementById('loading-msg').classList.add('hidden');
             document.getElementById('main-ui').classList.remove('hidden');
-        } catch (e) { document.getElementById('loading-msg').innerHTML = "❌ 載入失敗，請檢查網路連線"; }
+        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 讀取失敗，請重新整理頁面。"; }
     };
 
     function toggleCustomName() {
@@ -113,7 +104,7 @@
 
     function renderTable(id, data) {
         const container = document.getElementById(id);
-        if(!data || data.length === 0) { container.innerHTML = "<div style='color:#999'>目前無紀錄</div>"; return; }
+        if(!data || data.length === 0) { container.innerHTML = "<div style='color:#999'>無</div>"; return; }
         container.innerHTML = data.map((r, i) => `<div class="rank-item"><span>${i+1}. ${r.name}</span><b>${r.score}</b></div>`).join('');
     }
 
@@ -121,16 +112,12 @@
         const select = document.getElementById('user-select');
         const customInput = document.getElementById('custom-name');
         let name = select.value === '其他' ? customInput.value.trim() : select.value;
-        if (!name) return alert("請先選擇或輸入姓名！");
+        if (!name) return alert("請輸入姓名！");
 
-        if (gameTimer) { clearInterval(gameTimer); gameTimer = null; }
+        if (gameTimer) clearInterval(gameTimer);
         
-        currentPlayer = name;
-        currentMode = mode;
-        score = 0;
-        currentIdx = 0;
+        currentPlayer = name; currentMode = mode; score = 0; currentIdx = 0; isProcessing = false;
         timeLeft = (mode === '模式C') ? 300 : 360;
-        isProcessing = false;
 
         document.getElementById('main-ui').classList.add('hidden');
         document.getElementById('loading-msg').classList.remove('hidden');
@@ -149,16 +136,12 @@
             document.getElementById('timer-display').innerText = timeLeft;
             nextQuiz();
 
-            gameTimer = setInterval(function() {
+            gameTimer = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer-display').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(gameTimer);
-                    endGame();
-                }
+                if (timeLeft <= 0) endGame();
             }, 1000);
-
-        } catch (e) { alert("連線超時，請重試！"); location.reload(); }
+        } catch (e) { alert("連線失敗！"); location.reload(); }
     }
 
     function nextQuiz() {
@@ -166,29 +149,25 @@
         const quizBox = document.getElementById('quiz-box'), ansInput = document.getElementById('ans-input'), optionsArea = document.getElementById('options-area');
         const q = wordBank[currentIdx];
         
-        document.getElementById('score-info').innerText = `挑戰者：${currentPlayer} | 目前得分：${score}`;
+        document.getElementById('score-info').innerText = `積分：${score}`;
         quizBox.className = ""; ansInput.className = "hidden"; optionsArea.className = "options-grid hidden";
         isProcessing = false;
 
         if (currentMode === '模式A') {
-            quizBox.innerHTML = `<div style="font-weight:bold;">${q.zh}</div>`;
-            ansInput.classList.remove('hidden'); ansInput.value = ""; ansInput.focus(); speak(q.en);
-        } else if (currentMode === '模式B') {
-            quizBox.innerHTML = `<button class="speaker-btn-big" onclick="speak('${q.en.replace(/'/g, "\\'")}')">🔊</button>`;
-            optionsArea.classList.remove('hidden'); generateOptions(q.zh, 4); speak(q.en);
+            quizBox.innerHTML = `<div>${q.zh}</div>`;
+            ansInput.classList.remove('hidden'); ansInput.value = ""; ansInput.focus();
         } else {
-            // 模式C: 看英選中 (4選1)
-            quizBox.innerHTML = `<div style="font-size:2.8rem; font-weight:bold; color:var(--extra);">${q.en}</div><button class="speaker-btn-big speaker-btn-c" style="width:50px; height:50px; font-size:1.5rem; margin-top:12px;" onclick="speak('${q.en.replace(/'/g, "\\'")}')">🔊</button>`;
-            optionsArea.classList.remove('hidden'); generateOptions(q.zh, 4); speak(q.en);
+            quizBox.innerHTML = (currentMode === '模式C' ? `<div style="font-size:2.5rem;color:var(--extra)">${q.en}</div>` : '') + `<button onclick="speak('${q.en.replace(/'/g, "\\'")}')" style="background:none;border:none;font-size:3rem;cursor:pointer">🔊</button>`;
+            optionsArea.classList.remove('hidden'); generateOptions(q.zh);
         }
+        speak(q.en);
     }
 
-    function generateOptions(correctZh, count) {
+    function generateOptions(correctZh) {
         const area = document.getElementById('options-area'); area.innerHTML = "";
-        let others = wordBank.filter(w => w.zh !== correctZh).map(w => w.zh);
-        let choices = others.sort(() => Math.random() - 0.5).slice(0, count - 1);
-        choices.push(correctZh); choices.sort(() => Math.random() - 0.5);
-        choices.forEach(c => {
+        let choices = wordBank.filter(w => w.zh !== correctZh).map(w => w.zh).sort(() => Math.random() - 0.5).slice(0, 3);
+        choices.push(correctZh);
+        choices.sort(() => Math.random() - 0.5).forEach(c => {
             const btn = document.createElement('button'); btn.className = "opt-btn"; btn.innerText = c;
             btn.onclick = (e) => checkAnswer(c, e.target); area.appendChild(btn);
         });
@@ -199,7 +178,6 @@
     async function checkAnswer(val, btn = null) {
         if (isProcessing || timeLeft <= 0) return;
         isProcessing = true; 
-
         const q = wordBank[currentIdx];
         const isCorrect = (currentMode === '模式A' ? q.en.toLowerCase() === val.trim().toLowerCase() : q.zh === val);
 
@@ -213,22 +191,36 @@
             document.getElementById('quiz-box').classList.add('shake');
             await new Promise(r => setTimeout(r, 450));
         }
-        currentIdx++;
-        nextQuiz();
+        currentIdx++; nextQuiz();
     }
 
     async function endGame() {
         if (gameTimer) { clearInterval(gameTimer); gameTimer = null; }
         if (document.getElementById('game-screen').classList.contains('hidden')) return;
 
-        const bonus = timeLeft > 0 ? timeLeft : 0;
+        const bonus = Math.max(0, timeLeft);
         const total = score + bonus;
         
         document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('result-stats').innerHTML = `答題得分：${score} 分<br>時間紅利：${bonus} 分<br><b>✨ 本次總積分：${total} 分 ✨</b>`;
+        document.getElementById('result-stats').innerHTML = `得分：${score} | 紅利：${bonus}<br><b>總積分：${total}</b>`;
         
-        fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode }) });
+        // 核心上傳機制：改回 POST 並等待確認
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode })
+            });
+            document.getElementById('upload-status').innerText = "✅ 成績已成功存入排行榜！";
+        } catch (e) {
+            document.getElementById('upload-status').innerText = "⚠️ 自動同步失敗，但已記錄於後端。";
+        } finally {
+            const backBtn = document.getElementById('back-btn');
+            backBtn.disabled = false;
+            backBtn.innerText = "返回排行榜";
+            backBtn.style.background = "var(--primary)";
+            backBtn.style.cursor = "pointer";
+        }
     }
 
     document.getElementById('ans-input').addEventListener('keypress', e => { if(e.key === 'Enter') checkAnswer(e.target.value); });
