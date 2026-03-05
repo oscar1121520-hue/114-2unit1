@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語三模強化挑戰賽 v6.1</title>
+    <title>英語三模強化挑戰賽 v6.2</title>
     <style>
         :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; --extra: #e67e22; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -44,9 +44,13 @@
         <div id="main-ui" class="hidden">
             <select id="user-select" onchange="toggleCustomName()">
                 <option value="">-- 請選擇姓名 --</option>
-                <option value="Oscar">Oscar</option><option value="Alex">Alex</option><option value="Eve">Eve</option>
-                <option value="Xavier">Xavier</option><option value="Tim">Tim</option><option value="Chloe">Chloe</option>
-                <option value="Marco">Marco</option> <option value="其他">其他</option>
+                <option value="Oscar">Oscar</option>
+                <option value="Alex">Alex</option>
+                <option value="Eve">Eve</option>
+                <option value="Xavier">Xavier</option>
+                <option value="搶老奶奶拖鞋的24k純金大象">搶老奶奶拖鞋的24k純金大象</option> <option value="Chloe">Chloe</option>
+                <option value="Marco">Marco</option>
+                <option value="其他">其他</option>
             </select>
             <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請在此輸入姓名">
 
@@ -96,7 +100,7 @@
             ['rankA', 'rankB', 'rankC', 'rankTotal'].forEach(id => renderTable(id, data[id]));
             document.getElementById('loading-msg').classList.add('hidden');
             document.getElementById('main-ui').classList.remove('hidden');
-        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 讀取失敗，請重新整理頁面。"; }
+        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 載入失敗"; }
     };
 
     function toggleCustomName() {
@@ -106,7 +110,7 @@
 
     function renderTable(id, data) {
         const container = document.getElementById(id);
-        if(!data || data.length === 0) { container.innerHTML = "<div style='color:#999'>無</div>"; return; }
+        if(!data || data.length === 0) { container.innerHTML = "<div>無</div>"; return; }
         container.innerHTML = data.map((r, i) => `<div class="rank-item"><span>${i+1}. ${r.name}</span><b>${r.score}</b></div>`).join('');
     }
 
@@ -117,14 +121,12 @@
         if (!name) return alert("請輸入姓名！");
 
         if (gameTimer) clearInterval(gameTimer);
-        
         currentPlayer = name; currentMode = mode; score = 0; currentIdx = 0; isProcessing = false;
         timeLeft = (mode === '模式C') ? 300 : 360;
 
         document.getElementById('main-ui').classList.add('hidden');
         document.getElementById('loading-msg').classList.remove('hidden');
-        document.getElementById('loading-msg').innerText = "⏳ 題庫準備中...";
-
+        
         try {
             const action = (mode === '模式C') ? 'getExtraWords' : 'getWords';
             const res = await fetch(`${API_URL}?action=${action}`);
@@ -134,7 +136,6 @@
             document.getElementById('loading-msg').classList.add('hidden');
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-            
             document.getElementById('timer-display').innerText = timeLeft;
             nextQuiz();
 
@@ -143,14 +144,13 @@
                 document.getElementById('timer-display').innerText = timeLeft;
                 if (timeLeft <= 0) endGame();
             }, 1000);
-        } catch (e) { alert("連線失敗！"); location.reload(); }
+        } catch (e) { location.reload(); }
     }
 
     function nextQuiz() {
         if(currentIdx >= wordBank.length || timeLeft <= 0) return endGame();
         const quizBox = document.getElementById('quiz-box'), ansInput = document.getElementById('ans-input'), optionsArea = document.getElementById('options-area');
         const q = wordBank[currentIdx];
-        
         document.getElementById('score-info').innerText = `積分：${score}`;
         quizBox.className = ""; ansInput.className = "hidden"; optionsArea.className = "options-grid hidden";
         isProcessing = false;
@@ -199,26 +199,22 @@
     async function endGame() {
         if (gameTimer) { clearInterval(gameTimer); gameTimer = null; }
         if (document.getElementById('game-screen').classList.contains('hidden')) return;
-
         const bonus = Math.max(0, timeLeft);
         const total = score + bonus;
-        
         document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('result-screen').classList.remove('hidden');
         document.getElementById('result-stats').innerHTML = `得分：${score} | 紅利：${bonus}<br><b>總積分：${total}</b>`;
         
-        // 穩定上傳資料至 Google Apps Script
         try {
             await fetch(API_URL, {
                 method: "POST",
-                mode: "no-cors", // Google Apps Script 必要設定
+                mode: "no-cors",
                 body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode })
             });
-            // 延遲一點點確保 Google Server 處理完畢
             await new Promise(r => setTimeout(r, 1000));
-            document.getElementById('upload-status').innerText = "✅ 成績已成功存入雲端！";
+            document.getElementById('upload-status').innerText = "✅ 成績已存入雲端！";
         } catch (e) {
-            document.getElementById('upload-status').innerText = "⚠️ 上傳可能稍有延遲，請稍後查看排行榜。";
+            document.getElementById('upload-status').innerText = "⚠️ 上傳失敗。";
         } finally {
             const backBtn = document.getElementById('back-btn');
             backBtn.disabled = false;
