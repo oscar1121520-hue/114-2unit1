@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語三模強化挑戰賽 v6.2</title>
+    <title>英語三模強化挑戰賽 v6.4</title>
     <style>
         :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; --extra: #e67e22; }
         body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
@@ -28,9 +28,6 @@
         .opt-success { background: var(--success) !important; color: white !important; }
         .opt-danger { background: var(--danger) !important; color: white !important; }
 
-        .shake { animation: shake 0.4s; border-color: var(--danger) !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-8px); } }
-        
         #upload-status { font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
     </style>
 </head>
@@ -46,9 +43,10 @@
                 <option value="">-- 請選擇姓名 --</option>
                 <option value="Oscar">Oscar</option>
                 <option value="Alex">Alex</option>
-                <option value="Eve">Eve</option>
+                <option value="老爺爺夾腳拖">老爺爺夾腳拖</option>
                 <option value="Xavier">Xavier</option>
-                <option value="搶老奶奶拖鞋的24k純金大象">搶老奶奶拖鞋的24k純金大象</option> <option value="Chloe">Chloe</option>
+                <option value="搶老奶奶拖鞋的24k純金大象">搶老奶奶拖鞋的24k純金大象</option>
+                <option value="Chloe">Chloe</option>
                 <option value="Marco">Marco</option>
                 <option value="其他">其他</option>
             </select>
@@ -88,18 +86,39 @@
 </div>
 
 <script>
-    // 請確認您的 API 網址是否正確
     const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
     
     let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 0, currentIdx = 0, gameTimer = null, isProcessing = false;
 
     window.onload = async () => {
+        // 載入資料
         try {
             const res = await fetch(API_URL + `?t=${Date.now()}`);
             const data = await res.json();
             ['rankA', 'rankB', 'rankC', 'rankTotal'].forEach(id => renderTable(id, data[id]));
             document.getElementById('loading-msg').classList.add('hidden');
             document.getElementById('main-ui').classList.remove('hidden');
+            
+            // 讀取上次存下的姓名
+            const lastPlayer = localStorage.getItem('lastEnglishPlayer');
+            if (lastPlayer) {
+                const select = document.getElementById('user-select');
+                let found = false;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === lastPlayer) {
+                        select.selectedIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                // 如果是「其他」類型的自訂姓名
+                if (!found && lastPlayer !== "") {
+                    select.value = "其他";
+                    const customInput = document.getElementById('custom-name');
+                    customInput.value = lastPlayer;
+                    customInput.classList.remove('hidden');
+                }
+            }
         } catch (e) { document.getElementById('loading-msg').innerText = "❌ 載入失敗"; }
     };
 
@@ -110,7 +129,7 @@
 
     function renderTable(id, data) {
         const container = document.getElementById(id);
-        if(!data || data.length === 0) { container.innerHTML = "<div>無</div>"; return; }
+        if(!data || data.length === 0) { container.innerHTML = "<div>無紀錄</div>"; return; }
         container.innerHTML = data.map((r, i) => `<div class="rank-item"><span>${i+1}. ${r.name}</span><b>${r.score}</b></div>`).join('');
     }
 
@@ -118,7 +137,10 @@
         const select = document.getElementById('user-select');
         const customInput = document.getElementById('custom-name');
         let name = select.value === '其他' ? customInput.value.trim() : select.value;
-        if (!name) return alert("請輸入姓名！");
+        if (!name) return alert("請選擇姓名！");
+
+        // 儲存姓名到本地
+        localStorage.setItem('lastEnglishPlayer', name);
 
         if (gameTimer) clearInterval(gameTimer);
         currentPlayer = name; currentMode = mode; score = 0; currentIdx = 0; isProcessing = false;
@@ -146,6 +168,8 @@
             }, 1000);
         } catch (e) { location.reload(); }
     }
+
+    // ... (nextQuiz, generateOptions, speak, checkAnswer 函式保持不變) ...
 
     function nextQuiz() {
         if(currentIdx >= wordBank.length || timeLeft <= 0) return endGame();
@@ -211,10 +235,10 @@
                 mode: "no-cors",
                 body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode })
             });
-            await new Promise(r => setTimeout(r, 1000));
-            document.getElementById('upload-status').innerText = "✅ 成績已存入雲端！";
+            await new Promise(r => setTimeout(r, 1200));
+            document.getElementById('upload-status').innerText = "✅ 成績已同步至排行榜！";
         } catch (e) {
-            document.getElementById('upload-status').innerText = "⚠️ 上傳失敗。";
+            document.getElementById('upload-status').innerText = "⚠️ 上傳失敗，請檢查連線。";
         } finally {
             const backBtn = document.getElementById('back-btn');
             backBtn.disabled = false;
