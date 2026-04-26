@@ -3,252 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英語三模強化挑戰賽 v6.4</title>
+    <title>國小複習試卷導覽系統</title>
     <style>
-        :root { --primary: #6c5ce7; --success: #00b894; --danger: #ff7675; --dark: #2d3436; --light: #f8f9fa; --extra: #e67e22; }
-        body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        #app { background: white; width: 100%; max-width: 900px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; margin-top: 20px; }
-        .hidden { display: none; }
-        
-        select, .custom-name-input { width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 10px; border: 2px solid var(--primary); margin: 10px 0; outline: none; box-sizing: border-box; }
-        .mode-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
-        .btn-mode { padding: 20px 10px; border: 2px solid #ddd; border-radius: 15px; cursor: pointer; transition: 0.3s; background: white; }
-        .btn-mode:hover { border-color: var(--primary); background: #f3f0ff; transform: translateY(-3px); }
-
-        .rank-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-        .rank-card { background: var(--light); padding: 10px; border-radius: 12px; border: 1px solid #dee2e6; min-height: 180px; }
-        .rank-card b { display: block; margin-bottom: 8px; color: var(--dark); border-bottom: 2px solid #ddd; padding-bottom: 5px; font-size: 0.85rem; }
-        .rank-item { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; margin: 4px 0; padding: 2px 0; font-size: 0.8rem; }
-
-        .timer { font-size: 2.8rem; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
-        #quiz-box { background: #f1f3f5; padding: 30px 20px; border-radius: 15px; font-size: 1.8rem; margin-bottom: 20px; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-        .opt-btn { padding: 18px 12px; background: white; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; font-size: 1.1rem; transition: 0.1s; outline: none; }
-        .opt-success { background: var(--success) !important; color: white !important; }
-        .opt-danger { background: var(--danger) !important; color: white !important; }
-
-        #upload-status { font-size: 0.9rem; color: #888; margin-top: 10px; font-style: italic; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #eef2f3; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; }
+        select { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-size: 16px; background-color: #fff; cursor: pointer; }
+        select:focus { border-color: #3498db; outline: none; box-shadow: 0 0 5px rgba(52,152,219,0.3); }
+        button { width: 100%; padding: 14px; background-color: #3498db; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 10px; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <div id="start-screen">
-        <h1 style="color: var(--primary);">🎓 英語三模強化挑戰賽</h1>
-        <div id="loading-msg">⏳ 正在載入雲端紀錄...</div>
-        
-        <div id="main-ui" class="hidden">
-            <select id="user-select" onchange="toggleCustomName()">
-                <option value="">-- 請選擇姓名 --</option>
-                <option value="Oscar">Oscar</option>
-                <option value="Alex">Alex</option>
-                <option value="老爺爺夾腳拖">老爺爺夾腳拖</option>
-                <option value="Xavier">Xavier</option>
-                <option value="搶老奶奶拖鞋的24k純金大象">搶老奶奶拖鞋的24k純金大象</option>
-                <option value="Chloe">Chloe</option>
-                <option value="Marco">Marco</option>
-                <option value="其他">其他</option>
-            </select>
-            <input type="text" id="custom-name" class="custom-name-input hidden" placeholder="請在此輸入姓名">
-
-            <div class="mode-container">
-                <div class="btn-mode" onclick="startGame('模式A')"><h3>模式 A</h3><p>看中拼英</p></div>
-                <div class="btn-mode" onclick="startGame('模式B')"><h3>模式 B</h3><p>聽英選中</p></div>
-                <div class="btn-mode" style="border-color:var(--extra)" onclick="startGame('模式C')"><h3>模式 C</h3><p>課外單字</p></div>
-            </div>
-
-            <div class="rank-grid">
-                <div class="rank-card"><b>🏆 模式 A (最佳)</b><div id="rankA"></div></div>
-                <div class="rank-card"><b>🏆 模式 B (最佳)</b><div id="rankB"></div></div>
-                <div class="rank-card"><b>🏆 模式 C (最佳)</b><div id="rankC"></div></div>
-                <div class="rank-card" style="background: #efebff;"><b>🔥 總分榜</b><div id="rankTotal"></div></div>
-            </div>
-        </div>
+<div class="container">
+    <h2>📚 複習試卷導覽</h2>
+    
+    <div class="form-group">
+        <label>第一步：選擇年級</label>
+        <select id="gradeSelect">
+            <option value="">-- 請選擇年級 --</option>
+            <option value="3">三年級 (三下)</option>
+            <option value="5">五年級 (五下)</option>
+        </select>
     </div>
 
-    <div id="game-screen" class="hidden">
-        <div class="timer" id="timer-display">---</div>
-        <div id="score-info" style="font-weight: bold; margin-bottom: 10px;"></div>
-        <div id="quiz-box"></div>
-        <div id="input-area">
-            <input type="text" id="ans-input" class="hidden" placeholder="輸入完按 Enter">
-            <div id="options-area" class="options-grid hidden"></div>
-        </div>
+    <div class="form-group">
+        <label>第二步：選擇科目</label>
+        <select id="subjectSelect">
+            <option value="">-- 請先選擇年級 --</option>
+        </select>
     </div>
 
-    <div id="result-screen" class="hidden">
-        <h2>🎉 挑戰完成！</h2>
-        <div id="result-stats" style="font-size: 1.4rem; margin: 20px 0;"></div>
-        <div id="upload-status">⏳ 成績同步中，請稍候...</div>
-        <button id="back-btn" onclick="location.reload()" disabled style="padding:15px 50px; border-radius:10px; cursor:not-allowed; background:#ccc; color:white; border:none; font-size:1.1rem; margin-top:10px;">請稍候</button>
+    <div class="form-group">
+        <label>第三步：選擇章節</label>
+        <select id="chapterSelect">
+            <option value="">-- 請先選擇科目 --</option>
+        </select>
     </div>
+
+    <button id="okBtn" disabled>確定進入練習 (OK)</button>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyCBu8VfIfcUeHG7F08J6H552J3Im2vvAH8wT89CxjvT15xOZNVxd-8fY5dwtTx2bofoA/exec";
-    
-    let wordBank = [], currentPlayer = "", currentMode = "", score = 0, timeLeft = 0, currentIdx = 0, gameTimer = null, isProcessing = false;
-
-    window.onload = async () => {
-        // 載入資料
-        try {
-            const res = await fetch(API_URL + `?t=${Date.now()}`);
-            const data = await res.json();
-            ['rankA', 'rankB', 'rankC', 'rankTotal'].forEach(id => renderTable(id, data[id]));
-            document.getElementById('loading-msg').classList.add('hidden');
-            document.getElementById('main-ui').classList.remove('hidden');
-            
-            // 讀取上次存下的姓名
-            const lastPlayer = localStorage.getItem('lastEnglishPlayer');
-            if (lastPlayer) {
-                const select = document.getElementById('user-select');
-                let found = false;
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].value === lastPlayer) {
-                        select.selectedIndex = i;
-                        found = true;
-                        break;
-                    }
-                }
-                // 如果是「其他」類型的自訂姓名
-                if (!found && lastPlayer !== "") {
-                    select.value = "其他";
-                    const customInput = document.getElementById('custom-name');
-                    customInput.value = lastPlayer;
-                    customInput.classList.remove('hidden');
-                }
-            }
-        } catch (e) { document.getElementById('loading-msg').innerText = "❌ 載入失敗"; }
+    const data = {
+        "3": {
+            "國語": [
+                {n:"三下國語L7", u:"https://forms.gle/MFCVBnoVAM1PiUZ37"},
+                {n:"三下國語L8", u:"https://forms.gle/EvRHquD26kneMYCM6"},
+                {n:"三下國語L9", u:"https://forms.gle/LwqK8pxPBoNnhTuZ7"},
+                {n:"三下國語L10", u:"https://forms.gle/EabqrwQW2KUVTgkJA"},
+                {n:"三下國語L11", u:"https://forms.gle/nWjm9UWwE1dUo2Bo9"},
+                {n:"三下國語L12", u:"https://forms.gle/4mAcfxjFaYaa5ZoLA"}
+            ],
+            "自然": [
+                {n:"三下自然3-1", u:"https://forms.gle/iokuWRXJ8rzpXi2J9"},
+                {n:"三下自然3-2", u:"https://forms.gle/SQLo1CFhuikeXz1w9"},
+                {n:"三下自然3-3", u:"https://forms.gle/ac3YZn5XGgnKKFcv8"},
+                {n:"三下自然4-1", u:"https://forms.gle/zmR6W4myXDS5xMrV6"},
+                {n:"三下自然4-2", u:"https://forms.gle/hVTrDjSJS7mKrruS8"},
+                {n:"三下自然4-3", u:"https://forms.gle/L2dLdZ5Wgh1yrcUA7"}
+            ],
+            "社會": [
+                {n:"三下社會3-1", u:"https://forms.gle/JpAyCn1jo9n18t3Y8"},
+                {n:"三下社會3-2", u:"https://forms.gle/cpPTAvbekUBWnGsDA"},
+                {n:"三下社會4-1", u:"https://forms.gle/MSVXtzvWRe2rLR726"},
+                {n:"三下社會4-2", u:"https://forms.gle/oCTt9VEe31io9Jcc7"},
+                {n:"三下社會4-3", u:"https://forms.gle/QfomkQvEZqtowa3k7"}
+            ]
+        },
+        "5": {
+            "國語": [
+                {n:"五下國語L7", u:"https://forms.gle/bDX5Mp3TcxxeeyyP6"},
+                {n:"五下國語L8", u:"https://forms.gle/iq4wuYXh1t2q3RSL7"},
+                {n:"五下國語L9", u:"https://forms.gle/1Rv1MMNQF79bPM3U7"},
+                {n:"五下國語L10", u:"https://forms.gle/wfLYQzLpq9JpMieTA"},
+                {n:"五下國語L11", u:"https://forms.gle/ujwuBakHYbQP8tRD9"},
+                {n:"五下國語L12", u:"https://forms.gle/KoXxoS3QUixTwfsu5"}
+            ],
+            "自然": [
+                {n:"五下自然3-1", u:"https://forms.gle/t6W5iVqAzjsPWnxM8"},
+                {n:"五下自然3-2", u:"https://forms.gle/qipDrt5Ej5LkfsBD8"},
+                {n:"五下自然3-3", u:"https://forms.gle/umGeioGyzMqpgnW47"},
+                {n:"五下自然4-1", u:"https://forms.gle/RvEPhfVfx32kQ4fH9"},
+                {n:"五下自然4-2", u:"https://forms.gle/1je5jBUcbyNjb8yv8"},
+                {n:"五下自然4-3", u:"https://forms.gle/bu2mJGiWvwLFb3Kb9"}
+            ],
+            "社會": [
+                {n:"五下社會3-1", u:"https://forms.gle/vCaMeVUK57EppURV7"},
+                {n:"五下社會3-2", u:"https://forms.gle/zGcT2ouQCPx9GYWi9"},
+                {n:"五下社會4-1", u:"https://forms.gle/udGgv3bHC98NCdZX9"},
+                {n:"五下社會4-2", u:"https://forms.gle/4g8oBshxJ49cSRQ3A"},
+                {n:"五下社會4-3", u:"https://forms.gle/et4fGAyAiMiyYDuDA"}
+            ]
+        }
     };
 
-    function toggleCustomName() {
-        const customInput = document.getElementById('custom-name');
-        customInput.classList.toggle('hidden', document.getElementById('user-select').value !== '其他');
-    }
+    const gSel = document.getElementById('gradeSelect');
+    const sSel = document.getElementById('subjectSelect');
+    const cSel = document.getElementById('chapterSelect');
+    const btn = document.getElementById('okBtn');
 
-    function renderTable(id, data) {
-        const container = document.getElementById(id);
-        if(!data || data.length === 0) { container.innerHTML = "<div>無紀錄</div>"; return; }
-        container.innerHTML = data.map((r, i) => `<div class="rank-item"><span>${i+1}. ${r.name}</span><b>${r.score}</b></div>`).join('');
-    }
-
-    async function startGame(mode) {
-        const select = document.getElementById('user-select');
-        const customInput = document.getElementById('custom-name');
-        let name = select.value === '其他' ? customInput.value.trim() : select.value;
-        if (!name) return alert("請選擇姓名！");
-
-        // 儲存姓名到本地
-        localStorage.setItem('lastEnglishPlayer', name);
-
-        if (gameTimer) clearInterval(gameTimer);
-        currentPlayer = name; currentMode = mode; score = 0; currentIdx = 0; isProcessing = false;
-        timeLeft = (mode === '模式C') ? 300 : 360;
-
-        document.getElementById('main-ui').classList.add('hidden');
-        document.getElementById('loading-msg').classList.remove('hidden');
-        
-        try {
-            const action = (mode === '模式C') ? 'getExtraWords' : 'getWords';
-            const res = await fetch(`${API_URL}?action=${action}`);
-            wordBank = await res.json();
-            wordBank.sort(() => Math.random() - 0.5);
-
-            document.getElementById('loading-msg').classList.add('hidden');
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('timer-display').innerText = timeLeft;
-            nextQuiz();
-
-            gameTimer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-display').innerText = timeLeft;
-                if (timeLeft <= 0) endGame();
-            }, 1000);
-        } catch (e) { location.reload(); }
-    }
-
-    // ... (nextQuiz, generateOptions, speak, checkAnswer 函式保持不變) ...
-
-    function nextQuiz() {
-        if(currentIdx >= wordBank.length || timeLeft <= 0) return endGame();
-        const quizBox = document.getElementById('quiz-box'), ansInput = document.getElementById('ans-input'), optionsArea = document.getElementById('options-area');
-        const q = wordBank[currentIdx];
-        document.getElementById('score-info').innerText = `積分：${score}`;
-        quizBox.className = ""; ansInput.className = "hidden"; optionsArea.className = "options-grid hidden";
-        isProcessing = false;
-
-        if (currentMode === '模式A') {
-            quizBox.innerHTML = `<div>${q.zh}</div>`;
-            ansInput.classList.remove('hidden'); ansInput.value = ""; ansInput.focus();
-        } else {
-            quizBox.innerHTML = (currentMode === '模式C' ? `<div style="font-size:2.5rem;color:var(--extra)">${q.en}</div>` : '') + `<button onclick="speak('${q.en.replace(/'/g, "\\'")}')" style="background:none;border:none;font-size:3rem;cursor:pointer">🔊</button>`;
-            optionsArea.classList.remove('hidden'); generateOptions(q.zh);
-        }
-        speak(q.en);
-    }
-
-    function generateOptions(correctZh) {
-        const area = document.getElementById('options-area'); area.innerHTML = "";
-        let choices = wordBank.filter(w => w.zh !== correctZh).map(w => w.zh).sort(() => Math.random() - 0.5).slice(0, 3);
-        choices.push(correctZh);
-        choices.sort(() => Math.random() - 0.5).forEach(c => {
-            const btn = document.createElement('button'); btn.className = "opt-btn"; btn.innerText = c;
-            btn.onclick = (e) => checkAnswer(c, e.target); area.appendChild(btn);
-        });
-    }
-
-    function speak(t) { window.speechSynthesis.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
-
-    async function checkAnswer(val, btn = null) {
-        if (isProcessing || timeLeft <= 0) return;
-        isProcessing = true; 
-        const q = wordBank[currentIdx];
-        const isCorrect = (currentMode === '模式A' ? q.en.toLowerCase() === val.trim().toLowerCase() : q.zh === val);
-
-        if (isCorrect) {
-            score += 10;
-            if (btn) btn.classList.add('opt-success');
-            await new Promise(r => setTimeout(r, 150));
-        } else {
-            score -= 5;
-            if (btn) btn.classList.add('opt-danger');
-            document.getElementById('quiz-box').classList.add('shake');
-            await new Promise(r => setTimeout(r, 450));
-        }
-        currentIdx++; nextQuiz();
-    }
-
-    async function endGame() {
-        if (gameTimer) { clearInterval(gameTimer); gameTimer = null; }
-        if (document.getElementById('game-screen').classList.contains('hidden')) return;
-        const bonus = Math.max(0, timeLeft);
-        const total = score + bonus;
-        document.getElementById('game-screen').classList.add('hidden');
-        document.getElementById('result-screen').classList.remove('hidden');
-        document.getElementById('result-stats').innerHTML = `得分：${score} | 紅利：${bonus}<br><b>總積分：${total}</b>`;
-        
-        try {
-            await fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ name: currentPlayer, score: total, mode: currentMode })
+    gSel.onchange = function() {
+        sSel.innerHTML = '<option value="">-- 選擇科目 --</option>';
+        cSel.innerHTML = '<option value="">-- 請先選擇科目 --</option>';
+        btn.disabled = true;
+        if (this.value !== "") {
+            Object.keys(data[this.value]).forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                sSel.appendChild(opt);
             });
-            await new Promise(r => setTimeout(r, 1200));
-            document.getElementById('upload-status').innerText = "✅ 成績已同步至排行榜！";
-        } catch (e) {
-            document.getElementById('upload-status').innerText = "⚠️ 上傳失敗，請檢查連線。";
-        } finally {
-            const backBtn = document.getElementById('back-btn');
-            backBtn.disabled = false;
-            backBtn.innerText = "返回排行榜";
-            backBtn.style.background = "var(--primary)";
-            backBtn.style.cursor = "pointer";
         }
-    }
+    };
 
-    document.getElementById('ans-input').addEventListener('keypress', e => { if(e.key === 'Enter') checkAnswer(e.target.value); });
+    sSel.onchange = function() {
+        cSel.innerHTML = '<option value="">-- 選擇章節 --</option>';
+        btn.disabled = true;
+        if (this.value !== "") {
+            data[gSel.value][this.value].forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.u;
+                opt.textContent = item.n;
+                cSel.appendChild(opt);
+            });
+        }
+    };
+
+    cSel.onchange = function() {
+        btn.disabled = (this.value === "");
+    };
+
+    btn.onclick = function() {
+        if (cSel.value) window.open(cSel.value, '_blank');
+    };
 </script>
+
 </body>
 </html>
