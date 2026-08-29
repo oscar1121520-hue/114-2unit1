@@ -26,8 +26,10 @@
         <label>第一步：選擇年級</label>
         <select id="gradeSelect">
             <option value="">-- 請選擇年級 --</option>
-            <option value="3">三年級 (三下)</option>
-            <option value="5">五年級 (五下)</option>
+            <option value="3">三年級 (三上)</option>
+            <option value="4">四年級 (四上)</option>
+            <option value="5">五年級 (五上)</option>
+            <option value="6">六年級 (六上)</option>
         </select>
     </div>
 
@@ -52,52 +54,102 @@
     const data = {
         "3": {
             "國語": [
-                {n:"三下國語L7", u:"https://forms.gle/MFCVBnoVAM1PiUZ37"},
-                {n:"三下國語L8", u:"https://forms.gle/EvRHquD26kneMYCM6"},
-                {n:"三下國語L9", u:"https://forms.gle/LwqK8pxPBoNnhTuZ7"},
-                {n:"三下國語L10", u:"https://forms.gle/EabqrwQW2KUVTgkJA"},
-                {n:"三下國語L11", u:"https://forms.gle/nWjm9UWwE1dUo2Bo9"},
-                {n:"三下國語L12", u:"https://forms.gle/4mAcfxjFaYaa5ZoLA"}
+                {n:"三上國語L1", u:"https://forms.gle/YNrdWFkGhd4fo9mL7"},
+                {n:"三上國語L2", u:"https://forms.gle/FSBDjXHdAPXj9WCQ9"},
+                {n:"三上國語L3", u:"https://forms.gle/irkatwZQbQqPd8je9"},
+                {n:"三上國語L4", u:"https://forms.gle/JFez2HaFt6cQmLEBA"},
+                {n:"三上國語L5", u:"https://forms.gle/72J6NgRmAJrCfdX9A"},
+                {n:"三上國語L6", u:"https://forms.gle/uDzsZ68ai6ncFLhG6"}
             ],
             "自然": [
-                {n:"三下自然3-1", u:"https://forms.gle/iokuWRXJ8rzpXi2J9"},
-                {n:"三下自然3-2", u:"https://forms.gle/SQLo1CFhuikeXz1w9"},
-                {n:"三下自然3-3", u:"https://forms.gle/ac3YZn5XGgnKKFcv8"},
-                {n:"三下自然4-1", u:"https://forms.gle/zmR6W4myXDS5xMrV6"},
-                {n:"三下自然4-2", u:"https://forms.gle/hVTrDjSJS7mKrruS8"},
-                {n:"三下自然4-3", u:"https://forms.gle/L2dLdZ5Wgh1yrcUA7"}
+                {n:"三上自然1-1", u:"https://forms.gle/qXqRDg3M9W7VqHsQ6"},
+                {n:"三上自然1-2", u:"https://forms.gle/mxtB34WoFMPfCyWK6"},
+                {n:"三上自然1-3", u:"https://forms.gle/tTzf2aL2FLbXKowE7"},
+                {n:"三上自然2-1", u:"https://forms.gle/NtcQHDtefqtEvbSy6"},
+                {n:"三上自然2-2", u:"https://forms.gle/AtZ8hQGAQatQ2jcx8"},
+                {n:"三上自然2-3", u:"https://forms.gle/3RUrnjD4GRNQv84q8"}
             ],
             "社會": [
-                {n:"三下社會3-1", u:"https://forms.gle/JpAyCn1jo9n18t3Y8"},
-                {n:"三下社會3-2", u:"https://forms.gle/cpPTAvbekUBWnGsDA"},
-                {n:"三下社會4-1", u:"https://forms.gle/MSVXtzvWRe2rLR726"},
-                {n:"三下社會4-2", u:"https://forms.gle/oCTt9VEe31io9Jcc7"},
-                {n:"三下社會4-3", u:"https://forms.gle/QfomkQvEZqtowa3k7"}
+                {n:"三上社會1-1", u:"https://forms.gle/7X4i8M7hZKMBwZuF6"},
+                {n:"三上社會1-2", u:"https://forms.gle/t57RVcCgfM2Pn5X8A"},
+                {n:"三上社會1-3", u:"https://forms.gle/T19fJdPEGLFzZCJG8"},
+                {n:"三上社會2-1", u:"https://forms.gle/czPFH26fQGkLUp9g9"},
+                {n:"三上社會2-2", u:"https://forms.gle/HCbv3n2JQmFWVg8y9"}
+            ]
+        },
+        "4": {
+            "國語": [
+                {n:"四上國語L1", u:"https://forms.gle/85MmNGLVgQ9eEYZy9"},
+                {n:"四上國語L2", u:"https://forms.gle/NwfhcvfGdZc3Upg16"},
+                {n:"四上國語L3", u:"https://forms.gle/y9DkbJeYMf9YHgkL9"},
+                {n:"四上國語L4", u:"https://forms.gle/zW93EJkeU2DK2eDB7"},
+                {n:"四上國語L5", u:"https://forms.gle/nneCfhjW9ri1xbTz5"},
+                {n:"四上國語L6", u:"https://forms.gle/gzxvXxwTUjqipyN6A"}
+            ],
+            "自然": [
+                {n:"四上自然1-1", u:"https://forms.gle/Ua4pedhmPphBMaDb7"},
+                {n:"四上自然1-2", u:"https://forms.gle/x3HBHCFA3oiv3nft6"},
+                {n:"四上自然1-3", u:"https://forms.gle/2RSFasdexChpHyuX7"},
+                {n:"四上自然2-1", u:"https://forms.gle/wCPcmfuNcG3Zn4kf7"},
+                {n:"四上自然2-2", u:"https://forms.gle/QfpSYm6zPATSsJ2Q9"},
+                {n:"四上自然2-3", u:"https://forms.gle/QfpSYm6zPATSsJ2Q9"}
+            ],
+            "社會": [
+                {n:"四上社會1-1", u:"https://forms.gle/KtcTeqcu7TRV82ew8"},
+                {n:"四上社會1-2", u:"https://forms.gle/PY2YYTp8g6hTBoJX7"},
+                {n:"四上社會1-3", u:"https://forms.gle/UFq4tLb8hVJgMEb26"},
+                {n:"四上社會2-1", u:"https://forms.gle/G3bQtv4aPXgYiFQo9"},
+                {n:"四上社會2-2", u:"https://forms.gle/1UfstbohkDVBpzxw6"}
             ]
         },
         "5": {
             "國語": [
-                {n:"五下國語L7", u:"https://forms.gle/bDX5Mp3TcxxeeyyP6"},
-                {n:"五下國語L8", u:"https://forms.gle/iq4wuYXh1t2q3RSL7"},
-                {n:"五下國語L9", u:"https://forms.gle/1Rv1MMNQF79bPM3U7"},
-                {n:"五下國語L10", u:"https://forms.gle/wfLYQzLpq9JpMieTA"},
-                {n:"五下國語L11", u:"https://forms.gle/ujwuBakHYbQP8tRD9"},
-                {n:"五下國語L12", u:"https://forms.gle/KoXxoS3QUixTwfsu5"}
+                {n:"五上國語L1", u:"https://forms.gle/9QyKs4ZeNAzX1czEA"},
+                {n:"五上國語L2", u:"https://forms.gle/i2FmjUbTShYowJfw9"},
+                {n:"五上國語L3", u:"https://forms.gle/1b8Xcp8rKdNbHVai8"},
+                {n:"五上國語L4", u:"https://forms.gle/2m9pdAF2yVCnrtHA8"},
+                {n:"五上國語L5", u:"https://forms.gle/maZA7GJ5FkV1YqMu7"},
+                {n:"五上國語L6", u:"https://forms.gle/8T7EAvEvNe5p2HRFA"}
             ],
             "自然": [
-                {n:"五下自然3-1", u:"https://forms.gle/t6W5iVqAzjsPWnxM8"},
-                {n:"五下自然3-2", u:"https://forms.gle/qipDrt5Ej5LkfsBD8"},
-                {n:"五下自然3-3", u:"https://forms.gle/umGeioGyzMqpgnW47"},
-                {n:"五下自然4-1", u:"https://forms.gle/RvEPhfVfx32kQ4fH9"},
-                {n:"五下自然4-2", u:"https://forms.gle/1je5jBUcbyNjb8yv8"},
-                {n:"五下自然4-3", u:"https://forms.gle/BRs1MxqoMNN1Voh37"}
+                {n:"五上自然1-1", u:"https://forms.gle/6crrZVbHS6cCH8mN9"},
+                {n:"五上自然1-2", u:"https://forms.gle/GjUuNY31yy9Lbh6o7"},
+                {n:"五上自然1-3", u:"https://forms.gle/WXaLG2NFu4DmW9Gt6"},
+                {n:"五上自然2-1", u:"https://forms.gle/71ZTSpVKj9phYQgB8"},
+                {n:"五上自然2-2", u:"https://forms.gle/JBRksSMdwaZuZw27A"},
+                {n:"五上自然2-3", u:"https://forms.gle/KqR3UtzVZpDThFSK6"}
             ],
             "社會": [
-                {n:"五下社會3-1", u:"https://forms.gle/vCaMeVUK57EppURV7"},
-                {n:"五下社會3-2", u:"https://forms.gle/zGcT2ouQCPx9GYWi9"},
-                {n:"五下社會4-1", u:"https://forms.gle/udGgv3bHC98NCdZX9"},
-                {n:"五下社會4-2", u:"https://forms.gle/4g8oBshxJ49cSRQ3A"},
-                {n:"五下社會4-3", u:"https://forms.gle/et4fGAyAiMiyYDuDA"}
+                {n:"五上社會1-1", u:"https://forms.gle/qpiPdTZ3fAFks9Yv6"},
+                {n:"五上社會1-2", u:"https://forms.gle/vAZW8oePqCx14GP17"},
+                {n:"五上社會1-3", u:"https://forms.gle/6CPBKVh2AEgkyagb6"},
+                {n:"五上社會2-1", u:"https://forms.gle/qaNM6xXouHzaRA5S8"},
+                {n:"五上社會2-2", u:"https://forms.gle/HwuWvycCVywxfBCE6"}
+            ]
+        },
+        "6": {
+            "國語": [
+                {n:"六上國語L1", u:"https://forms.gle/ib1rpnJDQikbtv3j8"},
+                {n:"六上國語L2", u:"https://forms.gle/j6k6RgRBNBznk5N47"},
+                {n:"六上國語L3", u:"https://forms.gle/j6k6RgRBNBznk5N47"},
+                {n:"六上國語L4", u:"https://forms.gle/ad35zW8zNo5CeT9S9"},
+                {n:"六上國語L5", u:"https://forms.gle/RzDA7oy8831iyBcz5"},
+                {n:"六上國語L6", u:"https://forms.gle/d9Hy3GLoHWJi1p6C8"}
+            ],
+            "自然": [
+                {n:"六上自然1-1", u:"https://forms.gle/wJRgUT8eiZWhADTM9"},
+                {n:"六上自然1-2", u:"https://forms.gle/5kvg3Ra6qf1tohZDA"},
+                {n:"六上自然1-3", u:"https://forms.gle/BL57v6Jhwvz7CBeGA"},
+                {n:"六上自然2-1", u:"https://forms.gle/xETbbX5ifAVBa77WA"},
+                {n:"六上自然2-2", u:"https://forms.gle/u6HrtScWShDY1ZX28"},
+                {n:"六上自然2-3", u:"https://forms.gle/eQuGkxApZwYV2ftdA"}
+            ],
+            "社會": [
+                {n:"六上社會1-1", u:"https://forms.gle/5mWknC9wNeRK7mk38"},
+                {n:"六上社會1-2", u:"https://forms.gle/WLzfaiwjpUEFaBzN8"},
+                {n:"六上社會1-3", u:"https://forms.gle/9eC7LRpqG9YzD3Dr5"},
+                {n:"六上社會2-1", u:"https://forms.gle/4BUofppGmh5qQF9v6"},
+                {n:"六上社會2-2", u:"https://forms.gle/wkYmHEPkH7RiYSNy5"}
             ]
         }
     };
@@ -138,8 +190,12 @@
         btn.disabled = (this.value === "");
     };
 
+    // 本頁跳轉效果 (相當於 target="_self")
     btn.onclick = function() {
-        if (cSel.value) window.open(cSel.value, '_blank');
+        const url = cSel.value;
+        if (url) {
+            window.location.href = url;
+        }
     };
 </script>
 
